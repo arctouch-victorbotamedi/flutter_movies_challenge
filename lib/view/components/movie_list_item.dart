@@ -4,7 +4,7 @@ import 'package:movies_challenge/view/movie_detail_page.dart';
 import 'package:movies_challenge/view/components/poster_hero.dart';
 
 class MovieListItem extends StatelessWidget {
-  Movie _movie;
+  final Movie _movie;
   final tmdbImagesBaseUri = "http://image.tmdb.org/";
   final _biggerFont = const TextStyle(fontSize: 18.0);
 

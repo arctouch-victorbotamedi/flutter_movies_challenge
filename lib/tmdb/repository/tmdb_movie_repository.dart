@@ -17,9 +17,9 @@ class TmdbMovieRepository implements MovieRepository {
   @override
   Future<List<Movie>> fetchUpcomingMovies([int page = 1]) {
     final resource = '3/discover/movie';
-    final now = new DateTime.now().toIso8601String();
-    var httpClient = new HttpClient();
-    var uri = new Uri.https(ApiBaseUri, resource, {
+    final now = DateTime.now().toIso8601String();
+    var httpClient = HttpClient();
+    var uri = Uri.https(ApiBaseUri, resource, {
       'api_key': _tmdbKey,
       'page': page.toString(),
       'language': 'en-US',
@@ -32,9 +32,9 @@ class TmdbMovieRepository implements MovieRepository {
     return httpClient.getUrl(uri)
       .then((request) async {
         var response = await request.close();
-        if (response.statusCode == HttpStatus.OK) {
+        if (response.statusCode == HttpStatus.ok) {
           var data = await response.transform(utf8.decoder).join();
-          var movies = new MovieCollection.fromJson(jsonDecode(data));
+          var movies = MovieCollection.fromJson(jsonDecode(data));
           return movies.results;
         }
       },
