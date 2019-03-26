@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/view/components/arc_image.dart';
+import 'package:movies_challenge/view/components/movie_rating.dart';
 import 'package:movies_challenge/view/components/poster_hero.dart';
 
 
@@ -21,7 +22,7 @@ class MovieDetailHeader extends StatelessWidget {
           style: textTheme.title,
         ),
         SizedBox(height: 8.0),
-        // RatingInformation(movie),
+        MovieRating(_movie),
         SizedBox(height: 12.0),
         Row(children: _buildCategoryChips(textTheme)),
       ],
