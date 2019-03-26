@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies_challenge/model/movie.dart';
+import 'package:movies_challenge/view/components/movie_detal_header.dart';
 import 'package:movies_challenge/view/components/poster_hero.dart';
 
 
@@ -16,27 +17,31 @@ class MovieDetailPage extends StatelessWidget {
           title: new Text(_movie.title),
         ),
         body: new ListView(
-          padding: const EdgeInsets.all(16.0),
           children: [
-            _posterSection(),
+            _headerSection(),
             _overviewSection()
           ],
         )
     );
   }
 
-  Widget _posterSection() {
-    return new Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+  Widget _headerSection() {
+    return new Stack(
       children: [
-        new PosterHero(
-          tag: _movie.id.toString(),
-          image: _movie.posterUrl,
-          height: 200.0,
-        ),
-        _titleSection()
+        MovieDetailHeader(_movie)
       ],
     );
+//    return new Row(
+//      mainAxisAlignment: MainAxisAlignment.start,
+//      children: [
+//        new PosterHero(
+//          tag: _movie.id.toString(),
+//          image: _movie.posterUrl,
+//          height: 200.0,
+//        ),
+//        _titleSection()
+//      ],
+//    );
   }
 
   Widget _titleSection() {
