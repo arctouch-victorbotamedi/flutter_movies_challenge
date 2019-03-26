@@ -31,7 +31,7 @@ class MovieDetailHeader extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 140.0),
-          child: ArcImage(_movie.backdropUrl),
+          child: ArcImage(_movie.backdropUrl, 230),
         ),
         Positioned(
           bottom: 0.0,

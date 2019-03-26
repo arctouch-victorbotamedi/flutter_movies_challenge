@@ -11,4 +11,5 @@ abstract class Movie {
   String get backdropUrl;
   String get posterUrl;
   List<Genre> get genres;
+  double get rating; // Movie rating from 0-10
 }

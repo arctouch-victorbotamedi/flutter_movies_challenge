@@ -20,7 +20,7 @@ class Poster extends StatelessWidget {
     var width = PosterRatio * height;
 
     return new Material(
-      borderRadius: new BorderRadius.circular(3.0),
+      borderRadius: new BorderRadius.circular(4.0),
       elevation: 2.0,
       child: new CachedNetworkImage(
           placeholder: (context, url) => Image.asset(Resources.PosterPlaceholder, width: width, height: height),

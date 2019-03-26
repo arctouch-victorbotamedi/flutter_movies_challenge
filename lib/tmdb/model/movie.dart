@@ -21,6 +21,8 @@ class TmdbMovie implements Movie {
   String posterUrl;
   @override
   List<Genre> genres;
+  @override
+  double rating;
 
   List<int> _genreIds;
 
@@ -42,6 +44,7 @@ class TmdbMovie implements Movie {
             : DateTime.parse(json['release_date'] as String)
         ..backdropUrl = _parsePhotoUrl(json['backdrop_path'] as String)
         ..posterUrl = _parsePhotoUrl(json['poster_path'] as String)
+        ..rating = json['vote_average'].toDouble()
         .._genreIds = (json['genre_ids'] as List)
             ?.map((e) => e as int)?.toList()
         .._setGenres(allGenres);
