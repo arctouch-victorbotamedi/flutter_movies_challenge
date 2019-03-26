@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/view/movie_detail_page.dart';
 import 'package:movies_challenge/view/components/poster_hero.dart';
@@ -34,6 +35,7 @@ class MovieListItem extends StatelessWidget {
                         children: [
                           Text(_movie.title,
                               style: _biggerFont, overflow: TextOverflow.fade),
+                          Text(_formateReleaseDate(_movie)),
                           Text(_formatGenres(_movie), overflow: TextOverflow.fade)
                         ],
                   )
@@ -46,5 +48,11 @@ class MovieListItem extends StatelessWidget {
   String _formatGenres(Movie movie) {
     var genres = movie.genres.map((genre) => genre.name);
     return genres.join('| ');
+  }
+
+  String _formateReleaseDate(Movie movie) {
+    var date = DateFormat('MM/dd/yyyy')
+        .format(movie.releaseDate);
+    return "Release $date";
   }
 }
