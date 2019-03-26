@@ -14,30 +14,37 @@ class MovieListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return new InkResponse(
         onTap: () {
-          Navigator.push(
-              context,
-              new MaterialPageRoute(
-                  builder: (context) => new MovieDetailPage(_movie)));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => MovieDetailPage(_movie)));
         },
         highlightShape: BoxShape.rectangle,
-        child: new Container(
-          child: new Row(
+        child: Container(
+          child: Row(
             children: [
-              new PosterHero(
+              PosterHero(
                 tag: _movie.id.toString(),
                 image: _movie.posterUrl,
                 height: 100.0,
               ),
-              new Expanded(
-                  child: new Container(
-                    padding: const EdgeInsets.all(10.0),
-                    child: new Text(
-                        _movie.title,
-                        style: _biggerFont,
-                        overflow: TextOverflow.fade),
-                  ))
+              Expanded(
+                  child: Container(
+                      padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(_movie.title,
+                              style: _biggerFont, overflow: TextOverflow.fade),
+                          Text(_formatGenres(_movie), overflow: TextOverflow.fade)
+                        ],
+                  )
+              ))
             ],
           ),
         ));
+  }
+
+  String _formatGenres(Movie movie) {
+    var genres = movie.genres.map((genre) => genre.name);
+    return genres.join('| ');
   }
 }
