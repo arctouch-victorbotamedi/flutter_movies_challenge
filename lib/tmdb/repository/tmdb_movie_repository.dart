@@ -2,10 +2,12 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:movies_challenge/model/actor.dart';
 import 'package:movies_challenge/model/genre.dart';
 import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/tmdb/api_constants.dart';
 import 'package:movies_challenge/data/movie_repository.dart';
+import 'package:movies_challenge/tmdb/model/credits.dart';
 import 'package:movies_challenge/tmdb/model/genre_collection.dart';
 import 'package:movies_challenge/tmdb/model/movie_collection.dart';
 
@@ -47,6 +49,28 @@ class TmdbMovieRepository implements MovieRepository {
       onError: (error, stacktrace) {
 
       });
+  }
+
+  @override
+  Future<List<Actor>> fetchCast(Movie movie) {
+    final resource = '3/movie/${movie.id}/credits';
+    var httpClient = HttpClient();
+    var uri = Uri.https(ApiBaseUri, resource, {
+      'api_key': _tmdbKey,
+    });
+
+    return httpClient.getUrl(uri)
+        .then((request) async {
+          var response = await request.close();
+          if (response.statusCode == HttpStatus.ok) {
+            var data = await response.transform(utf8.decoder).join();
+            var credits = Credits.fromJson(jsonDecode(data));
+            return credits.cast;
+          }
+        },
+        onError: (error, stacktrace) {
+
+        });
   }
 
   Future<List<Genre>> fetchGenres() {
