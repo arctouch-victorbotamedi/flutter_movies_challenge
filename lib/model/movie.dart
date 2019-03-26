@@ -1,5 +1,7 @@
 
 
+import 'package:movies_challenge/model/genre.dart';
+
 abstract class Movie {
   int get id;
   String get title;
@@ -8,4 +10,5 @@ abstract class Movie {
   DateTime get releaseDate;
   String get backdropUrl;
   String get posterUrl;
+  List<Genre> get genres;
 }
