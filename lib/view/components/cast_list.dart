@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:movies_challenge/common/resources.dart';
 import 'package:movies_challenge/model/actor.dart';
 import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/view/providers/movies_provider.dart';
@@ -59,15 +61,19 @@ class CastList extends StatelessWidget {
 
   Widget _buildActor(BuildContext ctx, int index) {
     var actor = _cast[index];
-
+    var size = 70.0;
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
       child: Column(
         children: [
-          CircleAvatar(
-            backgroundImage: NetworkImage(actor.profileImage),
-            radius: 40.0,
-            backgroundColor: Color.fromARGB(255, 232, 232, 232)
+           ClipOval(
+              child: new CachedNetworkImage(
+                placeholder: (context, url) => Image.asset(Resources.PosterPlaceholder, width: size, height: size),
+                imageUrl: actor.profileImage,
+                fit: BoxFit.cover,
+                width: size,
+                height: size,
+              )
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
