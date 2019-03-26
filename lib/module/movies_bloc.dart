@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:movies_challenge/model/actor.dart';
+import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/model/movie_page.dart';
 import 'package:movies_challenge/module/movies_slice.dart';
 import 'package:movies_challenge/tmdb/repository/tmdb_movie_repository.dart';
@@ -28,6 +30,8 @@ class MoviesBloc {
   Sink<int> get index => _indexController.sink;
 
   Stream<MoviesSlice> get slice => _sliceSubject.stream;
+
+  Future<List<Actor>> cast(Movie movie) => _movieRepository.fetchCast(movie);
 
   int _getPageStartFromIndex(int index) =>
       (index ~/ _itemsPerPage) * _itemsPerPage;

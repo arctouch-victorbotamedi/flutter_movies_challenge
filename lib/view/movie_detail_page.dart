@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies_challenge/model/movie.dart';
+import 'package:movies_challenge/view/components/cast_list.dart';
 import 'package:movies_challenge/view/components/movie_detail_header.dart';
 import 'package:movies_challenge/view/components/poster_hero.dart';
 
@@ -19,7 +20,8 @@ class MovieDetailPage extends StatelessWidget {
         body: new ListView(
           children: [
             MovieDetailHeader(_movie),
-            _overviewSection(theme)
+            _overviewSection(theme),
+            CastList(_movie)
           ],
         )
     );
