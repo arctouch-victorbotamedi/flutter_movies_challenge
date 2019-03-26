@@ -6,7 +6,6 @@ import 'package:movies_challenge/view/components/poster_hero.dart';
 
 class MovieDetailPage extends StatelessWidget {
   final Movie _movie;
-  final _biggerFont = const TextStyle(fontSize: 18.0);
 
   MovieDetailPage(this._movie);
 
