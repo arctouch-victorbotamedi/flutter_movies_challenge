@@ -1,83 +1,50 @@
 import 'dart:async';
-import 'dart:math';
 
-import 'package:movies_challenge/model/actor.dart';
-import 'package:movies_challenge/model/movie.dart';
-import 'package:movies_challenge/model/movie_page.dart';
-import 'package:movies_challenge/module/movies_slice.dart';
-import 'package:movies_challenge/tmdb/repository/tmdb_movie_repository.dart';
-import 'package:rxdart/subjects.dart';
+import 'package:bloc/bloc.dart';
+import 'package:movies_challenge/data/movie_repository.dart';
+import 'package:movies_challenge/module/movie_event.dart';
+import 'package:movies_challenge/module/movie_state.dart';
+import 'package:rxdart/rxdart.dart';
 
-class MoviesBloc {
+class MoviesBloc extends Bloc<MovieEvent, MovieState> {
+  static const itemsPerPage = 20;
+  final MovieRepository movieRepository;
 
-  static const _itemsPerPage = 20;
+  MoviesBloc(this.movieRepository);
 
-  final _movieRepository = TmdbMovieRepository();
-  final _pages = <int, MoviePage>{};
-  final _indexController = PublishSubject<int>();
+  @override
+  MovieState get initialState => UninitializedState();
 
-  final _pagesBeingRequested = Set<int>();
-
-  final _sliceSubject = BehaviorSubject<MoviesSlice>();
-
-  MoviesBloc() {
-    _indexController.stream
-        .bufferTime(Duration(milliseconds: 500))
-        .where((batch) => batch.isNotEmpty)
-        .listen(_handleIndexes);
+  @override
+  Stream<MovieEvent> transform(Stream<MovieEvent> events) {
+    return (events as Observable<MovieEvent>)
+        .debounce(Duration(milliseconds: 500));
   }
 
-  Sink<int> get index => _indexController.sink;
-
-  Stream<MoviesSlice> get slice => _sliceSubject.stream;
-
-  Future<List<Actor>> cast(Movie movie) => _movieRepository.fetchCast(movie);
-
-  bool get isEmpty => _pages.isEmpty;
-
-  int _getPageStartFromIndex(int index) =>
-      (index ~/ _itemsPerPage) * _itemsPerPage;
-
-  void _handleIndexes(List<int> indexes) {
-    const maxInt = 0x7fffffff;
-    final int minIndex = indexes.fold(maxInt, min);
-    final int maxIndex = indexes.fold(-1, max);
-
-    final minPageIndex = _getPageStartFromIndex(minIndex);
-    final maxPageIndex = _getPageStartFromIndex(maxIndex);
-
-    for (int i = minPageIndex; i <= maxPageIndex; i += _itemsPerPage) {
-      final pageIndex = i ~/ _itemsPerPage;
-
-      if (_pages.containsKey(pageIndex) || _pagesBeingRequested.contains(pageIndex))
-        continue;
-
-      _pagesBeingRequested.add(pageIndex);
-      _requestPage(pageIndex)
-          .then((page) => _handleNewPage(page, pageIndex));
+  @override
+  Stream<MovieState> mapEventToState(MovieEvent event) async* {
+    if (event is Fetch && !_hasReachedMax(currentState)) {
+      try {
+        if (currentState is UninitializedState) {
+          final movies = await movieRepository.fetchUpcomingMovies(1);
+          yield MoviesLoadedState(movies: movies, hasReachedMax: false);
+          return;
+        }
+        if (currentState is MoviesLoadedState) {
+          var state = currentState as MoviesLoadedState;
+          var page = ((state.movies.length / itemsPerPage) + 1).toInt();
+          final movies = await movieRepository.fetchUpcomingMovies(page);
+          yield movies.isEmpty
+              ? state.copyWith(hasReachedMax: true)
+              : MoviesLoadedState(
+              movies: state.movies + movies, hasReachedMax: false);
+        }
+      } catch (_) {
+        yield ErrorState();
+      }
     }
-
-    // Remove pages too far from current scroll position.
-    //_pages.removeWhere((pageIndex, _) =>
-    //  pageIndex < minPageIndex - _itemsPerPage ||
-    //      pageIndex > maxPageIndex + _itemsPerPage);
   }
 
-  void _handleNewPage(MoviePage page, int index) {
-    _pages[index] = page;
-    _pagesBeingRequested.remove(index);
-    _sendNewSlice();
-  }
-
-  Future<MoviePage> _requestPage(int index) async {
-    var movies = await _movieRepository
-        .fetchUpcomingMovies(index + 1);
-    return MoviePage(movies, _itemsPerPage * index);
-  }
-
-  void _sendNewSlice() {
-    final pages = _pages.values.toList(growable: false);
-    final slice = MoviesSlice(pages, true);
-    _sliceSubject.add(slice);
-  }
+  bool _hasReachedMax(MovieState state) =>
+      state is MoviesLoadedState && state.hasReachedMax;
 }

@@ -15,11 +15,11 @@ class CastList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final moviesBloc = MoviesProvider.of(context);
-
-    return FutureBuilder<List<Actor>>(
-      future: moviesBloc.cast(_movie),
-      builder: _buildCastContainer,
-    );
+    return Text("Refactoring....");
+    //return FutureBuilder<List<Actor>>(
+    //  future: moviesBloc.cast(_movie),
+    //  builder: _buildCastContainer,
+    //);
   }
 
   Widget _buildCastContainer(BuildContext context, AsyncSnapshot<List<Actor>> snapshot) {
