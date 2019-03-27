@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:movies_challenge/module/movies_bloc.dart';
 import 'package:movies_challenge/module/movies_slice.dart';
 import 'package:movies_challenge/view/components/movie_list_item.dart';
 import 'package:movies_challenge/view/providers/movies_provider.dart';
@@ -14,14 +18,38 @@ class MovieList extends StatefulWidget {
 
 class _MoviesListHomePageState extends State<MovieList> {
 
+  StreamSubscription _subscription;
+  ConnectivityResult _connectivityStatus;
+
   @override
-  Widget build(BuildContext context) {
-    return _buildMovies(context);
+  void initState() {
+    super.initState();
+    Connectivity().checkConnectivity().then((ConnectivityResult result) {
+      _connectivityStatus = result;
+      setState(() => _connectivityStatus = result);
+      _subscription = Connectivity().onConnectivityChanged.listen(
+              (ConnectivityResult result) {
+                if (_connectivityStatus != result)
+                  setState(() => _connectivityStatus = result);
+              });
+    });
   }
 
-  Widget _buildMovies(BuildContext context) {
-    final moviesBloc = MoviesProvider.of(context);
+  @override
+  void dispose() {
+    super.dispose();
+    _subscription.cancel();
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    final moviesBloc = MoviesProvider.of(context);
+    if (!_hasInternetConenction() && moviesBloc.isEmpty)
+      return _buildNoInternetConnectionWidget();
+    return _buildMovies(context, moviesBloc);
+  }
+
+  Widget _buildMovies(BuildContext context, MoviesBloc moviesBloc) {
     return StreamBuilder<MoviesSlice>(
       stream: moviesBloc.slice,
       initialData: MoviesSlice.empty(),
@@ -47,5 +75,15 @@ class _MoviesListHomePageState extends State<MovieList> {
                 return MovieListItem(movie);
               }),
     );
+  }
+
+  Widget _buildNoInternetConnectionWidget() {
+    return Center(
+      child: Text("No Internet Connection"),
+    );
+  }
+
+  bool _hasInternetConenction() {
+    return _connectivityStatus != null && _connectivityStatus != ConnectivityResult.none;
   }
 }

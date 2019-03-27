@@ -33,6 +33,8 @@ class MoviesBloc {
 
   Future<List<Actor>> cast(Movie movie) => _movieRepository.fetchCast(movie);
 
+  bool get isEmpty => _pages.isEmpty;
+
   int _getPageStartFromIndex(int index) =>
       (index ~/ _itemsPerPage) * _itemsPerPage;
 
