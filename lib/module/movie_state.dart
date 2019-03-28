@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:movies_challenge/model/actor.dart';
 import 'package:movies_challenge/model/movie.dart';
 
 abstract class MovieState extends Equatable {
@@ -37,4 +38,15 @@ class MoviesLoadedState extends MovieState {
   @override
   String toString() =>
       'MoviesLoaded { movies: ${movies.length}, hasReachedMax: $hasReachedMax }';
+}
+
+class MovieCastLoadedState extends MovieState {
+  final List<Actor> cast;
+
+  MovieCastLoadedState(this.cast)
+      : super([cast]);
+
+  @override
+  String toString() =>
+      'MovieCastLoaded { cast: ${cast.length} }';
 }

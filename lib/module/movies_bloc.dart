@@ -25,24 +25,36 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
   Stream<MovieState> mapEventToState(MovieEvent event) async* {
     if (event is Fetch && !_hasReachedMax(currentState)) {
       try {
-        if (currentState is UninitializedState) {
-          final movies = await movieRepository.fetchUpcomingMovies(1);
-          yield MoviesLoadedState(movies: movies, hasReachedMax: false);
-          return;
-        }
-        if (currentState is MoviesLoadedState) {
-          var state = currentState as MoviesLoadedState;
-          var page = ((state.movies.length / itemsPerPage) + 1).toInt();
-          final movies = await movieRepository.fetchUpcomingMovies(page);
-          yield movies.isEmpty
-              ? state.copyWith(hasReachedMax: true)
-              : MoviesLoadedState(
-              movies: state.movies + movies, hasReachedMax: false);
-        }
+        yield* _buildMoviesLoadedState();
       } catch (_) {
         yield ErrorState();
       }
     }
+    if (event is FetchCast) {
+      yield* _buildCastLoadedState(event);
+    }
+  }
+
+  Stream<MovieState> _buildMoviesLoadedState() async* {
+    if (currentState is UninitializedState) {
+      final movies = await movieRepository.fetchUpcomingMovies(1);
+      yield MoviesLoadedState(movies: movies, hasReachedMax: false);
+      return;
+    }
+    if (currentState is MoviesLoadedState) {
+      var state = currentState as MoviesLoadedState;
+      var page = ((state.movies.length / itemsPerPage) + 1).toInt();
+      final movies = await movieRepository.fetchUpcomingMovies(page);
+      yield movies.isEmpty
+          ? state.copyWith(hasReachedMax: true)
+          : MoviesLoadedState(
+          movies: state.movies + movies, hasReachedMax: false);
+    }
+  }
+
+  Stream<MovieState> _buildCastLoadedState(FetchCast event) async* {
+    var cast = await movieRepository.fetchCast(event.movie);
+    yield MovieCastLoadedState(cast);
   }
 
   bool _hasReachedMax(MovieState state) =>
