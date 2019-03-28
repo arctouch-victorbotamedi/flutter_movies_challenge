@@ -7,3 +7,8 @@ class Fetch extends MovieEvent {
   @override
   String toString() => 'Fetch';
 }
+
+class NoInternetConnection extends MovieEvent {
+  @override
+  String toString() => 'NoInternetConnection';
+}

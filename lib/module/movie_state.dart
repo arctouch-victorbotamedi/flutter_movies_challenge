@@ -16,6 +16,11 @@ class ErrorState extends MovieState {
   String toString() => 'ErrorState';
 }
 
+class NoInternetConnectionState extends MovieState {
+  @override
+  String toString() => 'NoInternetConnectionState';
+}
+
 class MoviesLoadedState extends MovieState {
   final List<Movie> movies;
   final bool hasReachedMax;
