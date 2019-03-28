@@ -23,11 +23,9 @@ class _MoviesListHomePageState extends State<MovieList> {
   StreamSubscription _subscription;
   ConnectivityResult _connectivityStatus;
   final MoviesBloc _moviesBloc = MoviesBloc(TmdbMovieRepository());
-  final _scrollController = ScrollController();
-  final _scrollThreshold = 1500.0;
+  final _scrollThresholdPercentage = 70;
 
   _MoviesListHomePageState() {
-    _scrollController.addListener(_onScroll);
     _moviesBloc.dispatch(Fetch());
   }
 
@@ -80,16 +78,16 @@ class _MoviesListHomePageState extends State<MovieList> {
             );
           }
           return ListView.builder(
-              controller: _scrollController,
               padding: const EdgeInsets.all(16.0),
               itemBuilder: (context, index) {
+                var currentPercentage =  (index * 100) / state.movies.length;
+                if (currentPercentage >= _scrollThresholdPercentage) {
+                  _moviesBloc.dispatch(Fetch());
+                }
                 return index >= state.movies.length
                       ? BottomLoader()
                       : MovieListItem(state.movies[index]);
                 },
-                itemCount: state.hasReachedMax
-                    ? state.movies.length
-                    : state.movies.length + 1,
           );
         }
       }
@@ -104,14 +102,6 @@ class _MoviesListHomePageState extends State<MovieList> {
 
   bool _hasInternetConenction() {
     return _connectivityStatus != null && _connectivityStatus != ConnectivityResult.none;
-  }
-
-  void _onScroll() {
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.position.pixels;
-    if (maxScroll - currentScroll <= _scrollThreshold) {
-      _moviesBloc.dispatch(Fetch());
-    }
   }
 }
 
