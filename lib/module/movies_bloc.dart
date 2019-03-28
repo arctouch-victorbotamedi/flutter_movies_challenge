@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:movies_challenge/data/movie_repository.dart';
+import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/module/movie_event.dart';
 import 'package:movies_challenge/module/movie_state.dart';
 import 'package:rxdart/rxdart.dart';
@@ -33,20 +34,10 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
     }
     if (event is Fetch && !_hasReachedMax(currentState)) {
       try {
-        if (currentState is UninitializedState || currentState is NoInternetConnectionState) {
-          final movies = await movieRepository.fetchUpcomingMovies(1);
-          yield MoviesLoadedState(movies: movies, hasReachedMax: false);
-          return;
-        }
-        if (currentState is MoviesLoadedState) {
-          var state = currentState as MoviesLoadedState;
-          var page = ((state.movies.length / itemsPerPage) + 1).toInt();
-          final movies = await movieRepository.fetchUpcomingMovies(page);
-          yield movies.isEmpty
-              ? state.copyWith(hasReachedMax: true)
-              : MoviesLoadedState(
-              movies: state.movies + movies, hasReachedMax: false);
-        }
+        var loadedMovies = _getMovies();
+        var page = ((loadedMovies.length / itemsPerPage) + 1).toInt();
+        final movies = await movieRepository.fetchUpcomingMovies(page);
+        yield MoviesLoadedState(movies: loadedMovies + movies, hasReachedMax: false);
       } catch (_) {
         yield ErrorState();
       }
@@ -78,5 +69,11 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
         dispatch(Fetch());
     }
     _connectivityStatus = status;
+  }
+
+  List<Movie> _getMovies() {
+    if (currentState is MoviesLoadedState)
+      return (currentState as MoviesLoadedState).movies;
+    return [];
   }
 }
