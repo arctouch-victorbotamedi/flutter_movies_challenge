@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:movies_challenge/model/movie.dart';
+import 'package:movies_challenge/module/movie_details_bloc.dart';
 import 'package:movies_challenge/view/movie_detail_page.dart';
 import 'package:movies_challenge/view/components/poster_hero.dart';
+import 'package:movies_challenge/view/providers/movies_provider.dart';
 
 class MovieListItem extends StatelessWidget {
   final Movie _movie;
@@ -19,7 +21,14 @@ class MovieListItem extends StatelessWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => MovieDetailPage(_movie)));
+                    builder: (context) => MovieDetailPage(
+                        MovieDetailsBloc(
+                            _movie,
+                            DependencyProvider.movieRepositoryOf(context)
+                        )
+                    )
+                )
+            );
           },
           highlightShape: BoxShape.rectangle,
           child: Container(

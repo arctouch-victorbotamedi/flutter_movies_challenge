@@ -1,29 +1,28 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_challenge/common/resources.dart';
 import 'package:movies_challenge/model/actor.dart';
-import 'package:movies_challenge/model/movie.dart';
-import 'package:movies_challenge/view/providers/movies_provider.dart';
+import 'package:movies_challenge/module/movie_details_bloc.dart';
+import 'package:movies_challenge/module/movie_details_state.dart';
 
 class CastList extends StatelessWidget {
-  final Movie _movie;
-  List<Actor> _cast;
+  final MovieDetailsBloc _movieDetailsBloc;
 
-  CastList(this._movie);
+  CastList(this._movieDetailsBloc);
 
   @override
   Widget build(BuildContext context) {
-    final moviesBloc = MoviesProvider.of(context);
-    return Text("Refactoring....");
-    //return FutureBuilder<List<Actor>>(
-    //  future: moviesBloc.cast(_movie),
-    //  builder: _buildCastContainer,
-    //);
+    return BlocBuilder(
+      bloc: _movieDetailsBloc,
+      builder: (context, state) {
+        return _buildCastContainer(context, state);
+      },
+    );
   }
 
-  Widget _buildCastContainer(BuildContext context, AsyncSnapshot<List<Actor>> snapshot) {
-    _cast = snapshot.data;
+  Widget _buildCastContainer(BuildContext context, MovieDetailsState state) {
     var textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,15 +34,17 @@ class CastList extends StatelessWidget {
             style: textTheme.subhead.copyWith(fontSize: 18.0),
           ),
         ),
-        _buildActorList(snapshot),
+        _buildActorList(state),
       ],
     );
   }
 
-  Widget _buildActorList(AsyncSnapshot<List<Actor>> snapshot) {
-    if (snapshot.connectionState != ConnectionState.done)
+  Widget _buildActorList(MovieDetailsState state) {
+    if (!(state is MovieCastLoadedState))
       return SizedBox(height: 5);
-    if (snapshot.hasError || _cast.isEmpty)
+
+    MovieCastLoadedState castLoadedState = state;
+    if (castLoadedState.cast.isEmpty)
       return Center(
         child: Text("No cast information provided"),
       );
@@ -51,16 +52,17 @@ class CastList extends StatelessWidget {
     return SizedBox.fromSize(
       size: const Size.fromHeight(120.0),
       child: ListView.builder(
-        itemCount: _cast.length,
+        itemCount: castLoadedState.cast.length,
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.only(top: 12.0, left: 20.0),
-        itemBuilder: _buildActor,
+        itemBuilder: (context, index) =>
+            _buildActor(context, index, castLoadedState.cast),
       ),
     );
   }
 
-  Widget _buildActor(BuildContext ctx, int index) {
-    var actor = _cast[index];
+  Widget _buildActor(BuildContext ctx, int index, List<Actor> cast) {
+    var actor = cast[index];
     var size = 70.0;
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),

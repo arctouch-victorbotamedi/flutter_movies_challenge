@@ -6,8 +6,8 @@ import 'package:movies_challenge/module/movies_bloc.dart';
 import 'package:movies_challenge/tmdb/repository/tmdb_movie_repository.dart';
 
 void main() {
-
-  final moviesBloc = MoviesBloc(TmdbMovieRepository());
+  final repository = TmdbMovieRepository();
+  final moviesBloc = MoviesBloc(repository);
   BlocSupervisor().delegate = BlocLogDelegate();
-  runApp(MyApp(moviesBloc));
+  runApp(MyApp(repository, moviesBloc));
 }

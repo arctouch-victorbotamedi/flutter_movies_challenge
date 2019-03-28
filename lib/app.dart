@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movies_challenge/data/movie_repository.dart';
 import 'package:movies_challenge/module/movie_event.dart';
 import 'package:movies_challenge/module/movies_bloc.dart';
 import 'package:movies_challenge/view/home_page.dart';
@@ -8,15 +9,17 @@ import 'package:movies_challenge/view/providers/movies_provider.dart';
 class MyApp extends StatelessWidget {
 
   final MoviesBloc moviesBloc;
+  final MovieRepository movieRepository;
 
-  MyApp(this.moviesBloc) {
+  MyApp(this.movieRepository, this.moviesBloc) {
     moviesBloc.dispatch(Fetch());
   }
 
   @override
   Widget build(BuildContext context) {
-    return MoviesProvider(
-      movies: moviesBloc,
+    return DependencyProvider(
+      movieRepository: movieRepository,
+      moviesBloc: moviesBloc,
       child: new MaterialApp(
         title: 'Flutter Demo',
         theme: new ThemeData(

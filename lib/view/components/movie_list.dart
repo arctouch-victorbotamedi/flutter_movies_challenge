@@ -48,8 +48,8 @@ class _MoviesListHomePageState extends State<MovieList> {
 
   @override
   Widget build(BuildContext context) {
-    var moviesBloc = MoviesProvider.of(context);
-    moviesBloc.dispatch(Fetch());
+    var moviesBloc = DependencyProvider.moviesBlocOf(context);
+    // moviesBloc.dispatch(Fetch());
 
     //if (!_hasInternetConenction() && moviesBloc.isEmpty)
     //  return _buildNoInternetConnectionWidget();

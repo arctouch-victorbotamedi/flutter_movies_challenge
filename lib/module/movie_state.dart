@@ -39,14 +39,3 @@ class MoviesLoadedState extends MovieState {
   String toString() =>
       'MoviesLoaded { movies: ${movies.length}, hasReachedMax: $hasReachedMax }';
 }
-
-class MovieCastLoadedState extends MovieState {
-  final List<Actor> cast;
-
-  MovieCastLoadedState(this.cast)
-      : super([cast]);
-
-  @override
-  String toString() =>
-      'MovieCastLoaded { cast: ${cast.length} }';
-}

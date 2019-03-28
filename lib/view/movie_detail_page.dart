@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:movies_challenge/model/movie.dart';
+import 'package:movies_challenge/module/movie_details_bloc.dart';
+import 'package:movies_challenge/module/movie_event.dart';
 import 'package:movies_challenge/view/components/cast_list.dart';
 import 'package:movies_challenge/view/components/movie_detail_header.dart';
-import 'package:movies_challenge/view/components/poster_hero.dart';
 
 
 class MovieDetailPage extends StatelessWidget {
-  final Movie _movie;
+  final MovieDetailsBloc _movieDetailsBloc;
 
-  MovieDetailPage(this._movie);
+  MovieDetailPage(this._movieDetailsBloc) {
+    _movieDetailsBloc.dispatch(Fetch());
+  }
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text(_movie.title),
+          title: new Text(_movieDetailsBloc.currentState.movie.title),
         ),
         body: new ListView(
           children: [
-            MovieDetailHeader(_movie),
+            MovieDetailHeader(_movieDetailsBloc.currentState.movie),
             _overviewSection(theme),
-            CastList(_movie)
+            CastList(_movieDetailsBloc)
           ],
         )
     );
@@ -38,7 +41,7 @@ class MovieDetailPage extends StatelessWidget {
             ),
             SizedBox(height: 5),
             Text(
-              _movie.overview,
+              _movieDetailsBloc.currentState.movie.overview,
               style: theme.textTheme.body1.copyWith(
                   color: Colors.black45, fontSize: 16
               ),
