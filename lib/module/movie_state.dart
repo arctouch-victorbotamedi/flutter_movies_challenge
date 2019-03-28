@@ -44,3 +44,13 @@ class MoviesLoadedState extends MovieState {
   String toString() =>
       'MoviesLoaded { movies: ${movies.length}, hasReachedMax: $hasReachedMax }';
 }
+
+class OfflineDataState extends MovieState {
+  final List<Movie> movies;
+
+  OfflineDataState({this.movies,}) : super([movies]);
+
+  @override
+  String toString() =>
+      'OfflineDataState { movies: ${movies.length}';
+}

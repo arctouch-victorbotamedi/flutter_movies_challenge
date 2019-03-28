@@ -29,8 +29,13 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
 
   @override
   Stream<MovieState> mapEventToState(MovieEvent event) async* {
-    if (event is NoInternetConnection && !(currentState is MoviesLoadedState)) {
-      yield NoInternetConnectionState();
+    if (event is NoInternetConnection) {
+      if (!(currentState is MoviesLoadedState))
+        yield NoInternetConnectionState();
+      else {
+        var movies = (currentState as MoviesLoadedState).movies;
+        yield OfflineDataState(movies: movies);
+      }
     }
     if (event is Fetch && !_hasReachedMax(currentState)) {
       try {
@@ -38,10 +43,12 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
         var page = ((loadedMovies.length / itemsPerPage) + 1).toInt();
         final movies = await movieRepository.fetchUpcomingMovies(page);
         yield MoviesLoadedState(movies: loadedMovies + movies, hasReachedMax: false);
-      } catch (_) {
+      } catch (e) {
+        print(e);
         yield ErrorState();
       }
     }
+
   }
 
   @override
@@ -72,8 +79,12 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
   }
 
   List<Movie> _getMovies() {
-    if (currentState is MoviesLoadedState)
-      return (currentState as MoviesLoadedState).movies;
+    switch (currentState.runtimeType) {
+      case MoviesLoadedState:
+        return (currentState as MoviesLoadedState).movies;
+      case OfflineDataState:
+        return (currentState as OfflineDataState).movies;
+    }
     return [];
   }
 }

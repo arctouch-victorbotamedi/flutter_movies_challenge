@@ -29,20 +29,11 @@ class MovieList extends StatelessWidget {
             case NoInternetConnectionState:
               return _buildNoInternetConnectionWidget();
             case MoviesLoadedState:
-              return ListView.builder(
-                padding: const EdgeInsets.all(16.0),
-                itemBuilder: (context, index) {
-                  var currentPercentage =  (index * 100) / state.movies.length;
-                  if (currentPercentage >= _scrollThresholdPercentage) {
-                    moviesBloc.dispatch(Fetch());
-                  }
-                  return index >= state.movies.length
-                      ? BottomLoader()
-                      : MovieListItem(state.movies[index]);
-                },
-              );
+              return _buildMoviesListWidget(moviesBloc, state);
+            case OfflineDataState:
+              return _buildOfflineMoviesListWidget(state);
             default:
-              return Center(child: Text('failed to fetch posts'));
+              return Center(child: Text('Failed to fetch movies'));
           }
         }
     );
@@ -51,6 +42,33 @@ class MovieList extends StatelessWidget {
   Widget _buildNoInternetConnectionWidget() {
     return Center(
       child: Text("No Internet Connection"),
+    );
+  }
+
+  Widget _buildMoviesListWidget(MoviesBloc bloc, MoviesLoadedState state) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemBuilder: (context, index) {
+        var currentPercentage =  (index * 100) / state.movies.length;
+        if (currentPercentage >= _scrollThresholdPercentage) {
+          bloc.dispatch(Fetch());
+        }
+        return index >= state.movies.length
+            ? BottomLoader()
+            : MovieListItem(state.movies[index]);
+      },
+    );
+  }
+
+  Widget _buildOfflineMoviesListWidget(OfflineDataState state) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemCount: state.movies.length,
+      itemBuilder: (context, index) {
+        return index >= state.movies.length
+            ? BottomLoader()
+            : MovieListItem(state.movies[index]);
+      },
     );
   }
 }
