@@ -23,36 +23,26 @@ class MovieList extends StatelessWidget {
     return BlocBuilder(
         bloc: moviesBloc,
         builder: (context, state) {
-          if (state is UninitializedState) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (state is ErrorState) {
-            return Center(
-              child: Text('failed to fetch posts'),
-            );
-          }
-          if (state is NoInternetConnectionState)
-            return _buildNoInternetConnectionWidget();
-          if (state is MoviesLoadedState) {
-            if (state.movies.isEmpty) {
-              return Center(
-                child: Text('No movies'),
+          switch (state.runtimeType) {
+            case UninitializedState:
+              return Center(child: CircularProgressIndicator());
+            case NoInternetConnectionState:
+              return _buildNoInternetConnectionWidget();
+            case MoviesLoadedState:
+              return ListView.builder(
+                padding: const EdgeInsets.all(16.0),
+                itemBuilder: (context, index) {
+                  var currentPercentage =  (index * 100) / state.movies.length;
+                  if (currentPercentage >= _scrollThresholdPercentage) {
+                    moviesBloc.dispatch(Fetch());
+                  }
+                  return index >= state.movies.length
+                      ? BottomLoader()
+                      : MovieListItem(state.movies[index]);
+                },
               );
-            }
-            return ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemBuilder: (context, index) {
-                var currentPercentage =  (index * 100) / state.movies.length;
-                if (currentPercentage >= _scrollThresholdPercentage) {
-                  moviesBloc.dispatch(Fetch());
-                }
-                return index >= state.movies.length
-                    ? BottomLoader()
-                    : MovieListItem(state.movies[index]);
-              },
-            );
+            default:
+              return Center(child: Text('failed to fetch posts'));
           }
         }
     );
