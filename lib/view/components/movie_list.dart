@@ -6,9 +6,9 @@ import 'package:connectivity/connectivity.dart';
 import 'package:movies_challenge/module/movie_event.dart';
 import 'package:movies_challenge/module/movie_state.dart';
 import 'package:movies_challenge/module/movies_bloc.dart';
-import 'package:movies_challenge/tmdb/repository/tmdb_movie_repository.dart';
 import 'package:movies_challenge/view/components/movie_list_item.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movies_challenge/view/providers/movies_provider.dart';
 
 
 class MovieList extends StatefulWidget {
@@ -22,12 +22,9 @@ class _MoviesListHomePageState extends State<MovieList> {
 
   StreamSubscription _subscription;
   ConnectivityResult _connectivityStatus;
-  final MoviesBloc _moviesBloc = MoviesBloc(TmdbMovieRepository());
   final _scrollThresholdPercentage = 70;
 
-  _MoviesListHomePageState() {
-    _moviesBloc.dispatch(Fetch());
-  }
+  _MoviesListHomePageState();
 
   @override
   void initState() {
@@ -45,21 +42,23 @@ class _MoviesListHomePageState extends State<MovieList> {
 
   @override
   void dispose() {
-    _moviesBloc.dispose();
     _subscription.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    var moviesBloc = MoviesProvider.of(context);
+    moviesBloc.dispatch(Fetch());
+
     //if (!_hasInternetConenction() && moviesBloc.isEmpty)
     //  return _buildNoInternetConnectionWidget();
-    return _buildMovies(context);
+    return _buildMovies(context, moviesBloc);
   }
 
-  Widget _buildMovies(BuildContext context) {
+  Widget _buildMovies(BuildContext context, MoviesBloc moviesBloc) {
     return BlocBuilder(
-      bloc: _moviesBloc,
+      bloc: moviesBloc,
       builder: (context, state) {
         if (state is UninitializedState) {
           return Center(
@@ -82,7 +81,7 @@ class _MoviesListHomePageState extends State<MovieList> {
               itemBuilder: (context, index) {
                 var currentPercentage =  (index * 100) / state.movies.length;
                 if (currentPercentage >= _scrollThresholdPercentage) {
-                  _moviesBloc.dispatch(Fetch());
+                  moviesBloc.dispatch(Fetch());
                 }
                 return index >= state.movies.length
                       ? BottomLoader()
