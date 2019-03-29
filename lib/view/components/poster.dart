@@ -18,16 +18,19 @@ class Poster extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var width = PosterRatio * height;
-
+    var borderRadius = BorderRadius.circular(2.0);
     return new Material(
-      borderRadius: new BorderRadius.circular(4.0),
+      borderRadius: borderRadius,
       elevation: 2.0,
-      child: new CachedNetworkImage(
-          placeholder: (context, url) => Image.asset(Resources.PosterPlaceholder, width: width, height: height),
-          imageUrl: url,
-          fit: BoxFit.cover,
-          width: width,
-          height: height,
+      child: ClipRRect(
+          borderRadius: borderRadius,
+          child: CachedNetworkImage(
+            placeholder: (context, url) => Image.asset(Resources.PosterPlaceholder, width: width, height: height),
+            imageUrl: url,
+            fit: BoxFit.cover,
+            width: width,
+            height: height,
+        )
       )
     );
   }
