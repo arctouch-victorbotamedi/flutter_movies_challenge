@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:movies_challenge/model/movie.dart';
-import 'package:movies_challenge/module/movie_details_bloc.dart';
+import 'package:movies_challenge/module/movies_bloc.dart';
 import 'package:movies_challenge/view/movie_detail_page.dart';
 import 'package:movies_challenge/view/components/poster_hero.dart';
-import 'package:movies_challenge/view/providers/movies_provider.dart';
 
 class MovieListItem extends StatelessWidget {
   final Movie _movie;
@@ -14,6 +14,7 @@ class MovieListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var moviesBloc = BlocProvider.of<MoviesBloc>(context);
     return Column(
       children: [
         InkResponse(
@@ -21,12 +22,8 @@ class MovieListItem extends StatelessWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => MovieDetailPage(
-                        MovieDetailsBloc(
-                            _movie,
-                            DependencyProvider.movieRepositoryOf(context)
-                        )
-                    )
+                    builder: (context) =>
+                        MovieDetailPage(moviesBloc.movieRepository, _movie)
                 )
             );
           },

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_challenge/data/movie_repository.dart';
 import 'package:movies_challenge/module/movie_event.dart';
 import 'package:movies_challenge/module/movies_bloc.dart';
 import 'package:movies_challenge/view/home_page.dart';
-import 'package:movies_challenge/view/providers/movies_provider.dart';
-
 
 class MyApp extends StatelessWidget {
 
@@ -17,9 +16,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DependencyProvider(
-      movieRepository: movieRepository,
-      moviesBloc: moviesBloc,
+    return BlocProvider<MoviesBloc>(
+      bloc: moviesBloc,
       child: new MaterialApp(
         title: 'Flutter Demo',
         theme: new ThemeData(

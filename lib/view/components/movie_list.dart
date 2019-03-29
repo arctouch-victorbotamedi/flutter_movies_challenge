@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_challenge/module/movie_event.dart';
@@ -7,7 +5,6 @@ import 'package:movies_challenge/module/movie_state.dart';
 import 'package:movies_challenge/module/movies_bloc.dart';
 import 'package:movies_challenge/view/components/movie_list_item.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movies_challenge/view/providers/movies_provider.dart';
 
 
 class MovieList extends StatelessWidget {
@@ -15,7 +12,7 @@ class MovieList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var moviesBloc = DependencyProvider.moviesBlocOf(context);
+    var moviesBloc = BlocProvider.of<MoviesBloc>(context);
     return _buildMovies(context, moviesBloc);
   }
 
