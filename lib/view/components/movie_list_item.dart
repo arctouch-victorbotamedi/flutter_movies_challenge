@@ -14,19 +14,10 @@ class MovieListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var moviesBloc = BlocProvider.of<MoviesBloc>(context);
     return Column(
       children: [
         InkResponse(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        MovieDetailPage(moviesBloc.movieRepository, _movie)
-                )
-            );
-          },
+          onTap: () => _navigateToMovieDetails(context),
           highlightShape: BoxShape.rectangle,
           child: Container(
             child: Row(
@@ -67,5 +58,14 @@ class MovieListItem extends StatelessWidget {
   String _formateReleaseDate(Movie movie) {
     var date = DateFormat('MM/dd/yyyy').format(movie.releaseDate);
     return "Release $date";
+  }
+
+  void _navigateToMovieDetails(BuildContext context) {
+    var moviesBloc = BlocProvider.of<MoviesBloc>(context);
+    Navigator.push(context, MaterialPageRoute(
+        builder: (context) =>
+            MovieDetailPage(moviesBloc.movieRepository, _movie)
+        )
+    );
   }
 }
