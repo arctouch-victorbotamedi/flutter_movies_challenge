@@ -31,7 +31,7 @@ class MovieRating extends StatelessWidget {
           _movie.rating.toString(),
           style: theme.textTheme.title.copyWith(
             fontWeight: FontWeight.w400,
-            color: theme.accentColor,
+            color: theme.primaryColor,
           ),
         ),
         SizedBox(height: 4.0),
@@ -52,7 +52,7 @@ class MovieRating extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(top: 4.0, left: 4.0),
           child: Text(
-            'Grade now',
+            'Grade',
             style: ratingCaptionStyle,
           ),
         ),
@@ -65,7 +65,7 @@ class MovieRating extends StatelessWidget {
 
     var fiveStarRating = _movie.rating / 2;
     for (var i = 1; i <= 5; i++) {
-      var color = i <= fiveStarRating ? theme.accentColor : Colors.black12;
+      var color = i <= fiveStarRating ? theme.primaryColor : Colors.black12;
       var star = Icon(
         Icons.star,
         color: color,

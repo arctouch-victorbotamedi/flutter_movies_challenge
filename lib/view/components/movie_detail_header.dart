@@ -12,7 +12,8 @@ class MovieDetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var textTheme = Theme.of(context).textTheme;
+    var theme = Theme.of(context);
+    var textTheme = theme.textTheme;
 
     var movieInformation = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,7 +25,7 @@ class MovieDetailHeader extends StatelessWidget {
         SizedBox(height: 8.0),
         MovieRating(_movie),
         SizedBox(height: 12.0),
-        Row(children: _buildCategoryChips(textTheme)),
+        Row(children: _buildCategoryChips(theme)),
       ],
     );
 
@@ -56,14 +57,14 @@ class MovieDetailHeader extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildCategoryChips(TextTheme textTheme) {
+  List<Widget> _buildCategoryChips(ThemeData theme) {
     return _movie.genres.map((genre) {
       return Padding(
         padding: const EdgeInsets.only(right: 8.0),
         child: Chip(
           label: Text(genre.name),
-          labelStyle: textTheme.caption,
-          backgroundColor: Colors.black12,
+          labelStyle: theme.textTheme.caption.copyWith(color: Colors.white),
+          backgroundColor: theme.primaryColor,
         ),
       );
     }).toList();
