@@ -23,7 +23,11 @@ class Poster extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       elevation: 2.0,
       child: CachedNetworkImage(
-         placeholder: (context, url) => Image.asset(Resources.PosterPlaceholder, width: width, height: height),
+         placeholder: (context, url) => Image.asset(
+             Resources.PosterPlaceholder,
+             fit: BoxFit.cover,
+             width: width,
+             height: height),
          imageUrl: url,
          fit: BoxFit.cover,
          width: width,

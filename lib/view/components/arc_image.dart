@@ -18,7 +18,7 @@ class ArcImage extends StatelessWidget {
           decoration: BoxDecoration(color: Color.fromARGB(255, 232, 232, 232)),
           child: CachedNetworkImage(
             placeholder: (context, url) => Image.asset(
-                Resources.BackdropPlaceholder, width: screenWidth, height: _height),
+                Resources.BackdropPlaceholder, fit: BoxFit.cover, width: screenWidth, height: _height),
             imageUrl: _imageUrl,
             fit: BoxFit.cover,
             width: screenWidth,
