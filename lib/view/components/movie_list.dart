@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MovieList extends StatelessWidget {
   final _scrollThresholdPercentage = 70;
+  final EdgeInsets _movieListPadding = const EdgeInsets.all(16.0);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class MovieList extends StatelessWidget {
         builder: (context, state) {
           switch (state.runtimeType) {
             case UninitializedState:
-              return Center(child: CircularProgressIndicator());
+              return _buildUninitilazedList();
             case NoInternetConnectionState:
               return _buildNoInternetConnectionWidget();
             case MoviesLoadedState:
@@ -42,16 +43,23 @@ class MovieList extends StatelessWidget {
     );
   }
 
+  Widget _buildUninitilazedList() {
+    return ListView.builder(
+      padding: _movieListPadding,
+      itemBuilder: (context, index) => MovieListItem(null)
+    );
+  }
+
   Widget _buildMoviesListWidget(MoviesBloc bloc, MoviesLoadedState state) {
     return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
+      padding: _movieListPadding,
       itemBuilder: (context, index) {
         var currentPercentage =  (index * 100) / state.movies.length;
         if (currentPercentage >= _scrollThresholdPercentage) {
           bloc.dispatch(Fetch());
         }
         return index >= state.movies.length
-            ? BottomLoader()
+            ? MovieListItem(null)
             : MovieListItem(state.movies[index]);
       },
     );
@@ -59,7 +67,7 @@ class MovieList extends StatelessWidget {
 
   Widget _buildOfflineMoviesListWidget(OfflineDataState state) {
     return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
+      padding: _movieListPadding,
       itemCount: state.movies.length,
       itemBuilder: (context, index) {
         return index >= state.movies.length
