@@ -70,7 +70,7 @@ class CastList extends StatelessWidget {
         children: [
            ClipOval(
               child: new CachedNetworkImage(
-                placeholder: (context, url) => Image.asset(Resources.PosterPlaceholder, width: size, height: size),
+                placeholder: (context, url) => Image.asset(Resources.PosterPlaceholder, fit: BoxFit.cover, width: size, height: size),
                 imageUrl: actor.profileImage,
                 fit: BoxFit.cover,
                 width: size,
