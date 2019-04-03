@@ -5,6 +5,8 @@ import 'package:movies_challenge/module/movie_details_bloc.dart';
 import 'package:movies_challenge/module/movie_event.dart';
 import 'package:movies_challenge/view/components/cast_list.dart';
 import 'package:movies_challenge/view/components/movie_detail_header.dart';
+import 'package:gradient_app_bar/gradient_app_bar.dart';
+
 
 class MovieDetailPage extends StatefulWidget {
   final MovieRepository movieRepository;
@@ -38,7 +40,9 @@ class _MovieDetailsPage extends State<MovieDetailPage> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     return new Scaffold(
-        appBar: new AppBar(
+        appBar: GradientAppBar(
+          backgroundColorStart: theme.primaryColor,
+          backgroundColorEnd: theme.accentColor,
           title: new Text(_movie.title),
         ),
         body: new ListView(
