@@ -32,6 +32,7 @@ class MovieListItem extends StatelessWidget {
                    height: 100.0,
                  ),
                  isLoaded: isLoaded,
+                 duration: const Duration(milliseconds: 500),
                  width: 70,
                  height: 100
               ),
@@ -53,22 +54,24 @@ class MovieListItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Skeleton(
-              itemBuilder: (context) => Text(_movie.title,
-                  style: theme.textTheme.title,
-                  overflow: TextOverflow.fade),
-              isLoaded: isLoaded,
-              width: 300,
-              height: theme.textTheme.title.fontSize
+                itemBuilder: (context) => Text(_movie.title,
+                    style: Theme.of(context).textTheme.title,
+                    textAlign: TextAlign.left,
+                    overflow: TextOverflow.fade),
+                isLoaded: isLoaded,
+                width: 300,
+                height: theme.textTheme.title.fontSize
             ),
             Skeleton(
-                itemBuilder: (context) => Text(_formateReleaseDate(_movie)),
+                itemBuilder: (context) => Text(_formateReleaseDate(_movie), textAlign: TextAlign.left,),
                 isLoaded: isLoaded,
                 width: 150,
                 height: theme.textTheme.body1.fontSize
             ),
             Skeleton(
                 itemBuilder: (context) => Text(_formatGenres(_movie),
-                    overflow: TextOverflow.fade),
+                  overflow: TextOverflow.fade,
+                  textAlign: TextAlign.left),
                 isLoaded: isLoaded,
                 width: 200,
                 height: theme.textTheme.body1.fontSize
