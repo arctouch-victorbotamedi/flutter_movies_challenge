@@ -6,7 +6,6 @@ import 'package:movies_challenge/module/movie_event.dart';
 import 'package:movies_challenge/view/components/cast_list.dart';
 import 'package:movies_challenge/view/components/movie_detail_header.dart';
 
-
 class MovieDetailPage extends StatefulWidget {
   final MovieRepository movieRepository;
   final Movie movie;

@@ -51,7 +51,7 @@ class MovieList extends StatelessWidget {
           bloc.dispatch(Fetch());
         }
         return index >= state.movies.length
-            ? BottomLoader()
+            ? MovieListItem(null)
             : MovieListItem(state.movies[index]);
       },
     );
