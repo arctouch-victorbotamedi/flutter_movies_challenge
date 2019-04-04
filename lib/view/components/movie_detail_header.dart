@@ -13,9 +13,24 @@ class MovieDetailHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    var textTheme = theme.textTheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        PosterHero(
+          tag: _movie.id.toString(),
+          image: _movie.posterUrl,
+          height: 180.0,
+        ),
+        SizedBox(width: 16.0),
+        Expanded(child: _buildMovieInformation(theme)),
+      ],
+    );
+  }
 
-    var movieInformation = Column(
+  Widget _buildMovieInformation(ThemeData theme) {
+    var textTheme = theme.textTheme;
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -26,33 +41,6 @@ class MovieDetailHeader extends StatelessWidget {
         MovieRating(_movie),
         SizedBox(height: 12.0),
         Row(children: _buildCategoryChips(theme)),
-      ],
-    );
-
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 140.0),
-          child: ArcImage(_movie.backdropUrl, 230),
-        ),
-        Positioned(
-          bottom: 0.0,
-          left: 16.0,
-          right: 16.0,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              PosterHero(
-                tag: _movie.id.toString(),
-                image: _movie.posterUrl,
-                height: 180.0,
-              ),
-              SizedBox(width: 16.0),
-              Expanded(child: movieInformation),
-            ],
-          ),
-        ),
       ],
     );
   }

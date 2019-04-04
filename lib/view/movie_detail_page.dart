@@ -3,6 +3,7 @@ import 'package:movies_challenge/data/movie_repository.dart';
 import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/module/movie_details_bloc.dart';
 import 'package:movies_challenge/module/movie_event.dart';
+import 'package:movies_challenge/view/components/arc_image.dart';
 import 'package:movies_challenge/view/components/cast_list.dart';
 import 'package:movies_challenge/view/components/movie_detail_header.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
@@ -36,6 +37,10 @@ class _MovieDetailsPage extends State<MovieDetailPage> {
     super.dispose();
   }
 
+  var top = 0.0;
+  var imageHeight = 230.0;
+  var scaledImageHeight = 230.0;
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
@@ -45,19 +50,41 @@ class _MovieDetailsPage extends State<MovieDetailPage> {
           backgroundColorEnd: theme.accentColor,
           title: new Text(_movie.title),
         ),
-        body: new ListView(
-          children: [
-            MovieDetailHeader(_movie),
-            _overviewSection(theme),
-            CastList(_movieDetailsBloc)
-          ],
+        body: NotificationListener<ScrollUpdateNotification>(
+          onNotification: (notification) {
+            setState(() {
+              var factor = notification.scrollDelta / 2;
+              top -= factor;
+              scaledImageHeight -= factor;
+              print('Scale: $scaledImageHeight');
+              print('Top: $top');
+            });
+          },
+          child: Stack(
+            children: [
+              Positioned(
+                top : top <= 0 ? top : 0,
+                child: ArcImage(_movie.backdropUrl, imageHeight >= scaledImageHeight ? imageHeight : scaledImageHeight)
+              ),
+              ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16, top: 200.0),
+                    child: MovieDetailHeader(_movie),
+                  ),
+                  _overviewSection(theme),
+                  CastList(_movieDetailsBloc)
+                ],
+              )
+            ],
+          )
         )
     );
   }
 
   Widget _overviewSection(ThemeData theme) {
     return Container(
-        padding: const EdgeInsets.only(top: 15.0, left: 16, right: 16),
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 15.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
