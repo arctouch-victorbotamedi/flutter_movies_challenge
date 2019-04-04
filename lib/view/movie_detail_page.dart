@@ -3,9 +3,11 @@ import 'package:movies_challenge/data/movie_repository.dart';
 import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/module/movie_details_bloc.dart';
 import 'package:movies_challenge/module/movie_event.dart';
+import 'package:movies_challenge/view/components/arc_image.dart';
 import 'package:movies_challenge/view/components/cast_list.dart';
 import 'package:movies_challenge/view/components/movie_detail_header.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
+import 'package:movies_challenge/view/components/scale_parallax.dart';
 
 
 class MovieDetailPage extends StatefulWidget {
@@ -45,19 +47,24 @@ class _MovieDetailsPage extends State<MovieDetailPage> {
           backgroundColorEnd: theme.accentColor,
           title: new Text(_movie.title),
         ),
-        body: new ListView(
+        body: ScaleParallax(
+          height: 230,
+          parallax: ArcImage(_movie.backdropUrl),
           children: [
-            MovieDetailHeader(_movie),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 200.0),
+              child: MovieDetailHeader(_movie),
+            ),
             _overviewSection(theme),
             CastList(_movieDetailsBloc)
-          ],
+          ]
         )
     );
   }
 
   Widget _overviewSection(ThemeData theme) {
     return Container(
-        padding: const EdgeInsets.only(top: 15.0, left: 16, right: 16),
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 15.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

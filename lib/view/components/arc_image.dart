@@ -4,10 +4,10 @@ import 'package:movies_challenge/common/resources.dart';
 
 
 class ArcImage extends StatelessWidget {
-  ArcImage(this._imageUrl, this._height);
+  ArcImage(this._imageUrl, {this.height});
 
   final String _imageUrl;
-  final double _height;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -18,11 +18,11 @@ class ArcImage extends StatelessWidget {
           decoration: BoxDecoration(color: Color.fromARGB(255, 232, 232, 232)),
           child: CachedNetworkImage(
             placeholder: (context, url) => Image.asset(
-                Resources.BackdropPlaceholder, fit: BoxFit.cover, width: screenWidth, height: _height),
+                Resources.BackdropPlaceholder, fit: BoxFit.cover, width: screenWidth, height: height),
             imageUrl: _imageUrl,
             fit: BoxFit.cover,
             width: screenWidth,
-            height: _height,
+            height: height,
           ),
       )
     );
