@@ -7,16 +7,8 @@ import 'package:movies_challenge/view/components/arc_image.dart';
 import 'package:movies_challenge/view/components/cast_list.dart';
 import 'package:movies_challenge/view/components/movie_detail_header.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
+import 'package:movies_challenge/view/components/scale_parallax.dart';
 
-//class DeltaScrollController extends ScrollController {
-//
-//  double delta() {
-//    if (positions.length <= 2)
-//      return 0;
-//    var lastPosition = positions.elementAt(positions.length - 2).pixels;
-//    return position.pixels - lastPosition;
-//  }
-//}
 
 class MovieDetailPage extends StatefulWidget {
   final MovieRepository movieRepository;
@@ -33,33 +25,18 @@ class _MovieDetailsPage extends State<MovieDetailPage> {
   MovieRepository get _movieRepository => widget.movieRepository;
   Movie get _movie => widget.movie;
 
-  TrackingScrollController _scrollController = TrackingScrollController();
-
   @override
   void initState() {
     _movieDetailsBloc = MovieDetailsBloc(_movie, _movieRepository);
     _movieDetailsBloc.dispatch(Fetch());
-    _scrollController.addListener(() {
-      setState(() {
-        var offset = _scrollController.offset - _scrollController.initialScrollOffset;
-        var factor = offset / 2;
-        top -= factor;
-        scaledImageHeight -= factor;
-      });
-    });
     super.initState();
   }
 
   @override
   void dispose() {
     _movieDetailsBloc.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
-
-  var top = 0.0;
-  var imageHeight = 230.0;
-  var scaledImageHeight = 230.0;
 
   @override
   Widget build(BuildContext context) {
@@ -70,25 +47,17 @@ class _MovieDetailsPage extends State<MovieDetailPage> {
           backgroundColorEnd: theme.accentColor,
           title: new Text(_movie.title),
         ),
-        body: Stack(
+        body: ScaleParallax(
+          height: 230,
+          parallax: ArcImage(_movie.backdropUrl),
           children: [
-            Positioned(
-              top : top <= 0 ? top : 0,
-              child: ArcImage(_movie.backdropUrl, imageHeight >= scaledImageHeight ? imageHeight : scaledImageHeight)
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 200.0),
+              child: MovieDetailHeader(_movie),
             ),
-            ListView(
-              physics: AlwaysScrollableScrollPhysics(parent:BouncingScrollPhysics()),
-              controller: _scrollController,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16, top: 200.0),
-                  child: MovieDetailHeader(_movie),
-                ),
-                _overviewSection(theme),
-                CastList(_movieDetailsBloc)
-              ],
-            )
-          ],
+            _overviewSection(theme),
+            CastList(_movieDetailsBloc)
+          ]
         )
     );
   }
