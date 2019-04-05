@@ -3,21 +3,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_challenge/data/movie_repository.dart';
 import 'package:movies_challenge/module/movie_event.dart';
 import 'package:movies_challenge/module/movies_bloc.dart';
+import 'package:movies_challenge/module/search_bloc.dart';
 import 'package:movies_challenge/view/home_page.dart';
 
 class MyApp extends StatelessWidget {
 
   final MoviesBloc moviesBloc;
+  final SearchBloc searchBloc;
   final MovieRepository movieRepository;
 
-  MyApp(this.movieRepository, this.moviesBloc) {
+  MyApp(this.movieRepository, this.moviesBloc, this.searchBloc) {
     moviesBloc.dispatch(Fetch());
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<MoviesBloc>(
-      bloc: moviesBloc,
+    return BlocProviderTree(
+      blocProviders: [
+        BlocProvider<MoviesBloc>(bloc: moviesBloc),
+        BlocProvider<SearchBloc>(bloc: searchBloc),
+      ],
       child: new MaterialApp(
         title: 'Flutter Demo',
         theme: new ThemeData(
