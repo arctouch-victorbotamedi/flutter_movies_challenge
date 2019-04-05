@@ -45,6 +45,7 @@ class _MovieDetailsPage extends State<MovieDetailPage> {
         appBar: GradientAppBar(
           backgroundColorStart: theme.primaryColor,
           backgroundColorEnd: theme.accentColor,
+          elevation: 1,
           title: new Text(_movie.title),
         ),
         body: ScaleParallax(
