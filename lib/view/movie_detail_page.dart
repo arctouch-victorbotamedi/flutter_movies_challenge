@@ -53,7 +53,7 @@ class _MovieDetailsPage extends State<MovieDetailPage> {
           parallax: ArcImage(_movie.backdropUrl),
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 200.0),
+              padding: const EdgeInsets.only(left: 16, top: 200.0),
               child: MovieDetailHeader(_movie),
             ),
             _overviewSection(theme),

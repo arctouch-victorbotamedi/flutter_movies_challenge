@@ -40,21 +40,28 @@ class MovieDetailHeader extends StatelessWidget {
         SizedBox(height: 8.0),
         MovieRating(_movie),
         SizedBox(height: 12.0),
-        Row(children: _buildCategoryChips(theme)),
+        _buildCategoryChips(theme),
       ],
     );
   }
 
-  List<Widget> _buildCategoryChips(ThemeData theme) {
-    return _movie.genres.map((genre) {
-      return Padding(
-        padding: const EdgeInsets.only(right: 8.0),
-        child: Chip(
-          label: Text(genre.name),
-          labelStyle: theme.textTheme.caption.copyWith(color: Colors.white),
-          backgroundColor: theme.primaryColor,
-        ),
-      );
-    }).toList();
+  Widget _buildCategoryChips(ThemeData theme) {
+    return SizedBox.fromSize(
+      size: const Size.fromHeight(50),
+      child: ListView.builder(
+        itemCount: _movie.genres.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) =>
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Chip(
+                label: Text(_movie.genres[index].name),
+                labelStyle: theme.textTheme.caption.copyWith(color: Colors.white),
+                backgroundColor: theme.primaryColor,
+                elevation: 1,
+              ),
+            )
+      ),
+    );
   }
 }
