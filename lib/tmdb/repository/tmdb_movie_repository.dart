@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:movies_challenge/data/cache/cache_database_provider.dart';
+import 'package:movies_challenge/data/cache/cache.dart';
 import 'package:movies_challenge/model/actor.dart';
 import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/data/movie_repository.dart';
@@ -13,24 +13,18 @@ class TmdbMovieRepository implements MovieRepository {
   static const _moviesCacheKey = 'MoviesCache';
 
   final TmdbMovieApi api;
-  final CacheDatabaseProvider cache;
+  final Cache cache;
 
   List<TmdbGenre> _genres;
   
   TmdbMovieRepository(this.api, this.cache) {
-    cache.get(_genresCacheKey).then((cachedGenres) {
-      if (cachedGenres != null) {
-        var genres = cachedGenres as List<dynamic>;
-        _genres = genres.map((genre) => TmdbGenre.fromJson(genre)).toList();
-      }
-      else
-        print('No genres in cache');
-      api.fetchGenres().then((genres) {
-        _genres = genres;
-        cache.insert(_genresCacheKey, genres);
-      });
-    });
+    cache.fetchList<TmdbGenre>(_genresCacheKey, api.fetchGenres, test)
+        .listen((genres) => _genres = genres)
+        .onError((ex, stack) => print(ex));
   }
+
+  TmdbGenre test(dynamic ob) => TmdbGenre.fromJson(ob);
+
 
   @override
   Future<List<Movie>> fetchUpcomingMovies([int page = 1]) async {
