@@ -9,14 +9,27 @@ import 'package:movies_challenge/tmdb/model/movie.dart';
 import 'package:movies_challenge/tmdb/repository/tmdb_movie_api.dart';
 
 class TmdbMovieRepository implements MovieRepository {
+  static const _genresCacheKey = 'GenresCache';
+  static const _moviesCacheKey = 'MoviesCache';
+
   final TmdbMovieApi api;
   final CacheDatabaseProvider cache;
 
   List<TmdbGenre> _genres;
   
   TmdbMovieRepository(this.api, this.cache) {
-    api.fetchGenres()
-        .then((genres) => _genres = genres);
+    cache.get(_genresCacheKey).then((cachedGenres) {
+      if (cachedGenres != null) {
+        var genres = cachedGenres as List<dynamic>;
+        _genres = genres.map((genre) => TmdbGenre.fromJson(genre)).toList();
+      }
+      else
+        print('No genres in cache');
+      api.fetchGenres().then((genres) {
+        _genres = genres;
+        cache.insert(_genresCacheKey, genres);
+      });
+    });
   }
 
   @override
