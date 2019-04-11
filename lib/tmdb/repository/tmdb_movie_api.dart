@@ -14,10 +14,7 @@ class TmdbMovieApi {
   static const maxPages = 1000;
   static const _tmdbKey = "1f54bd990f1cdfb230adb312546d765d";
 
-  List<TmdbGenre> _genres;
-
   Future<List<TmdbMovie>> fetchUpcomingMovies([int page = 1]) async {
-    if (_genres == null) _genres = await fetchGenres();
 
     final resource = '3/discover/movie';
     final now = DateTime.now().toIso8601String();
@@ -36,7 +33,7 @@ class TmdbMovieApi {
       var response = await request.close();
       if (response.statusCode == HttpStatus.ok) {
         var data = await response.transform(utf8.decoder).join();
-        var movies = MovieCollection.fromJson(jsonDecode(data), _genres);
+        var movies = MovieCollection.fromJson(jsonDecode(data));
         return movies.results;
       }
     }, onError: (error, stacktrace) {});
@@ -92,7 +89,7 @@ class TmdbMovieApi {
       var response = await request.close();
       if (response.statusCode == HttpStatus.ok) {
         var data = await response.transform(utf8.decoder).join();
-        var movies = MovieCollection.fromJson(jsonDecode(data), _genres);
+        var movies = MovieCollection.fromJson(jsonDecode(data));
         return movies.results;
       }
     },

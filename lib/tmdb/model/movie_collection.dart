@@ -1,4 +1,3 @@
-import 'package:movies_challenge/model/genre.dart';
 import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/tmdb/model/movie.dart';
 
@@ -11,11 +10,11 @@ class MovieCollection {
 
   MovieCollection();
 
-  factory MovieCollection.fromJson(Map<String, dynamic> json, List<Genre> allGenres) =>
+  factory MovieCollection.fromJson(Map<String, dynamic> json) =>
       new MovieCollection()
         ..totalResults = json['total_results'] as int
         ..totalPages = json['total_pages'] as int
         ..results = (json['results'] as List)
-            ?.map((e) => e == null ? null : TmdbMovie.fromJson(e as Map<String, dynamic>, allGenres))
+            ?.map((e) => e == null ? null : TmdbMovie.fromJson(e as Map<String, dynamic>))
             ?.toList();
 }
