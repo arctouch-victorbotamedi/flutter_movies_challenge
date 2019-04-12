@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:movies_challenge/model/genre.dart';
 import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/tmdb/api_constants.dart';
