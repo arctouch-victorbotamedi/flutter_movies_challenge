@@ -10,7 +10,7 @@ import 'package:movies_challenge/tmdb/repository/tmdb_movie_api.dart';
 
 class TmdbMovieRepository implements MovieRepository {
   static const _genresCacheKey = 'GenresCache';
-  static const _moviesCacheKey = 'MoviesCache';
+  static const _moviesCacheKey = 'MovieCache';
 
   final TmdbMovieApi api;
   final Cache cache;
@@ -18,19 +18,15 @@ class TmdbMovieRepository implements MovieRepository {
   List<TmdbGenre> _genres;
   
   TmdbMovieRepository(this.api, this.cache) {
-    cache.fetchList<TmdbGenre>(_genresCacheKey, api.fetchGenres, test)
+    cache.fetchList<TmdbGenre>(_genresCacheKey, api.fetchGenres, (obj) => TmdbGenre.fromJson(obj))
         .listen((genres) => _genres = genres)
         .onError((ex, stack) => print(ex));
   }
-
-  TmdbGenre test(dynamic ob) => TmdbGenre.fromJson(ob);
-
 
   @override
   Future<List<Movie>> fetchUpcomingMovies([int page = 1]) async {
     if (_genres == null) 
       _genres = await api.fetchGenres();
-
     var movies = await api.fetchUpcomingMovies(page);
     _setMovieGenres(movies);
     return movies;

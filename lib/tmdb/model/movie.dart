@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:movies_challenge/model/genre.dart';
 import 'package:movies_challenge/model/movie.dart';
 import 'package:movies_challenge/tmdb/api_constants.dart';
@@ -55,7 +57,7 @@ class TmdbMovie implements Movie {
     'backdrop_path': _backdropPath,
     'poster_path': _posterPath,
     'vote_average': rating,
-    'genre_ids': _genreIds?.toString()
+    'genre_ids': _genreIds
   };
 
   static String _parsePhotoUrl(String url) {
