@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:movies_challenge/data/movie_repository.dart';
 import 'package:movies_challenge/model/movie.dart';
+import 'package:movies_challenge/model/page.dart';
 import 'package:movies_challenge/module/movie_event.dart';
 import 'package:movies_challenge/module/movie_state.dart';
 import 'package:rxdart/rxdart.dart';
@@ -13,6 +14,9 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
   final MovieRepository movieRepository;
   ConnectivityResult _connectivityStatus;
   StreamSubscription _subscription;
+
+  List<Page<Movie>> _pages = [];
+  int _currentPage = 0;
 
   MoviesBloc(this.movieRepository) {
     _subscribeToConnectivityChanges();
@@ -39,16 +43,27 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
     }
     if (event is Fetch && !_hasReachedMax(currentState)) {
       try {
-        var loadedMovies = _getMovies();
-        var page = ((loadedMovies.length / itemsPerPage) + 1).toInt();
-        final movies = await movieRepository.fetchUpcomingMovies(page);
-        yield MoviesLoadedState(movies: loadedMovies + movies, hasReachedMax: false);
+        movieRepository.fetchUpcomingMovies(++_currentPage)
+            .listen(_onPageFetch, onDone: _onDonePageFetch);
       } catch (e) {
         print(e);
         yield ErrorState();
       }
     }
-
+    if (event is PageLoaded) {
+      try {
+        if (_pages.isNotEmpty && _pages.last.page == _currentPage) {
+          _pages.removeLast();
+        }
+        _pages.add(event.page);
+        var movies = _pages
+            .map((page) => page.results)
+            .expand((iterable) => iterable).toList();
+        yield MoviesLoadedState(movies: movies, hasReachedMax: false);
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 
   @override
@@ -78,13 +93,11 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
     _connectivityStatus = status;
   }
 
-  List<Movie> _getMovies() {
-    switch (currentState.runtimeType) {
-      case MoviesLoadedState:
-        return (currentState as MoviesLoadedState).movies;
-      case OfflineDataState:
-        return (currentState as OfflineDataState).movies;
-    }
-    return [];
+  void _onPageFetch(Page<Movie> page) {
+    dispatch(PageLoaded(page));
+  }
+
+  void _onDonePageFetch() {
+    print("Finish getting some movies");
   }
 }

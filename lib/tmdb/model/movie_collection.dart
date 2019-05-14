@@ -1,11 +1,16 @@
 import 'package:movies_challenge/model/movie.dart';
+import 'package:movies_challenge/model/page.dart';
 import 'package:movies_challenge/tmdb/model/movie.dart';
 
 
-class MovieCollection {
-
+class MovieCollection implements Page<Movie> {
+  @override
   int totalResults;
+  @override
   int totalPages;
+  @override
+  int page;
+  @override
   List<Movie> results;
 
   MovieCollection();
@@ -17,4 +22,11 @@ class MovieCollection {
         ..results = (json['results'] as List)
             ?.map((e) => e == null ? null : TmdbMovie.fromJson(e as Map<String, dynamic>))
             ?.toList();
+
+  Map<String, dynamic> toJson() => {
+    'total_results': totalResults,
+    'total_pages': totalPages,
+    'page': page,
+    'results': results.map((item)=> (item as TmdbMovie).toJson()).toList(),
+  };
 }
