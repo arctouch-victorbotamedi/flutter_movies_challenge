@@ -19,7 +19,7 @@ class TmdbMovie implements Movie {
   @override
   String posterUrl;
   @override
-  List<Genre> genres;
+  List<Genre> genres = [];
   @override
   double rating;
 

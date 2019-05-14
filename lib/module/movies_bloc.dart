@@ -33,18 +33,10 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
 
   @override
   Stream<MovieState> mapEventToState(MovieEvent event) async* {
-    if (event is NoInternetConnection) {
-      if (!(currentState is MoviesLoadedState))
-        yield NoInternetConnectionState();
-      else {
-        var movies = (currentState as MoviesLoadedState).movies;
-        yield OfflineDataState(movies: movies);
-      }
-    }
     if (event is Fetch && !_hasReachedMax(currentState)) {
       try {
         movieRepository.fetchUpcomingMovies(++_currentPage)
-            .listen(_onPageFetch, onDone: _onDonePageFetch);
+            .listen(_onPageFetch, onDone: _onDonePageFetch, onError: _onFetchError);
       } catch (e) {
         print(e);
         yield ErrorState();
@@ -59,7 +51,10 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
         var movies = _pages
             .map((page) => page.results)
             .expand((iterable) => iterable).toList();
-        yield MoviesLoadedState(movies: movies, hasReachedMax: false);
+        if (_isOffline())
+          yield OfflineDataState(movies: movies);
+        else
+          yield MoviesLoadedState(movies: movies, hasReachedMax: false);
       } catch (e) {
         print(e);
       }
@@ -85,7 +80,7 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
 
   void _updateConnectivityStatus(ConnectivityResult status) {
     if (status != _connectivityStatus) {
-      if (status == ConnectivityResult.none)
+      if (_isOffline())
         dispatch(NoInternetConnection());
       else if (_connectivityStatus != null)
         dispatch(Fetch());
@@ -93,11 +88,18 @@ class MoviesBloc extends Bloc<MovieEvent, MovieState> {
     _connectivityStatus = status;
   }
 
+  bool _isOffline() => _connectivityStatus == ConnectivityResult.none;
+
   void _onPageFetch(Page<Movie> page) {
     dispatch(PageLoaded(page));
   }
 
   void _onDonePageFetch() {
     print("Finish getting some movies");
+  }
+
+
+  void _onFetchError(Object error) {
+    print("Error loading movies $error");
   }
 }

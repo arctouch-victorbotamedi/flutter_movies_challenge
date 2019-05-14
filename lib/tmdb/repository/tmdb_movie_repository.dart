@@ -61,6 +61,8 @@ class TmdbMovieRepository implements MovieRepository {
   }
 
   void _setMovieGenre(Movie movie) {
+    if (_genres == null)
+      return;
     var tmdbMovie = movie as TmdbMovie;
     tmdbMovie.genres = _genres
       .where((genre) => tmdbMovie.genreIds.any((id) => id == genre.id))
