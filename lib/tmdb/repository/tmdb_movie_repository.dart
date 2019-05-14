@@ -1,110 +1,71 @@
-import 'dart:io';
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:movies_challenge/data/cache/cache.dart';
 import 'package:movies_challenge/model/actor.dart';
-import 'package:movies_challenge/model/genre.dart';
 import 'package:movies_challenge/model/movie.dart';
-import 'package:movies_challenge/tmdb/api_constants.dart';
 import 'package:movies_challenge/data/movie_repository.dart';
-import 'package:movies_challenge/tmdb/model/credits.dart';
-import 'package:movies_challenge/tmdb/model/genre_collection.dart';
+import 'package:movies_challenge/model/page.dart';
+import 'package:movies_challenge/tmdb/model/genre.dart';
+import 'package:movies_challenge/tmdb/model/movie.dart';
 import 'package:movies_challenge/tmdb/model/movie_collection.dart';
+import 'package:movies_challenge/tmdb/repository/tmdb_movie_api.dart';
 
 class TmdbMovieRepository implements MovieRepository {
-  static const maxPages = 1000;
-  static const _tmdbKey = "1f54bd990f1cdfb230adb312546d765d";
+  static const _genresCacheKey = 'GenresCache';
+  static const _moviesCacheKey = 'MoviesCache';
 
-  List<Genre> _genres;
+  final TmdbMovieApi api;
+  final Cache cache;
+
+  List<TmdbGenre> _genres;
+  
+  TmdbMovieRepository(this.api, this.cache) {
+    cache.fetchList<TmdbGenre>(_genresCacheKey, api.fetchGenres, (obj) => TmdbGenre.fromJson(obj))
+        .listen((genres) => _genres = genres)
+        .onError((ex, stack) => print(ex));
+  }
 
   @override
-  Future<List<Movie>> fetchUpcomingMovies([int page = 1]) async {
-    if (_genres == null) _genres = await fetchGenres();
-
-    final resource = '3/discover/movie';
-    final now = DateTime.now().toIso8601String();
-    var httpClient = HttpClient();
-    var uri = Uri.https(ApiBaseUri, resource, {
-      'api_key': _tmdbKey,
-      'page': page.toString(),
-      'language': 'en-US',
-      'sort_by': 'primary_release_date.asc',
-      'include_adult': 'false',
-      'include_video': 'false',
-      'primary_release_date.gte': now,
-    });
-
-    return httpClient.getUrl(uri).then((request) async {
-      var response = await request.close();
-      if (response.statusCode == HttpStatus.ok) {
-        var data = await response.transform(utf8.decoder).join();
-        var movies = MovieCollection.fromJson(jsonDecode(data), _genres);
-        return movies.results;
-      }
-    }, onError: (error, stacktrace) {});
+  Stream<Page<Movie>> fetchUpcomingMovies([int page = 1]) {
+    return cache.fetchObject<Page<Movie>>(
+        '$_moviesCacheKey-$page',
+        () async {
+          var resultPage = await api.fetchUpcomingMovies(page);
+          _setMovieGenres(resultPage.results);
+          return resultPage;
+        },
+        (obj) {
+          var resultPage = MovieCollection.fromJson(obj)
+            ..page = page;
+          _setMovieGenres(resultPage.results);
+          return resultPage;
+        });
   }
 
   @override
   Future<List<Actor>> fetchCast(Movie movie) {
-    final resource = '3/movie/${movie.id}/credits';
-    var httpClient = HttpClient();
-    var uri = Uri.https(ApiBaseUri, resource, {
-      'api_key': _tmdbKey,
-    });
-
-    return httpClient.getUrl(uri).then((request) async {
-      var response = await request.close();
-      if (response.statusCode == HttpStatus.ok) {
-        var data = await response.transform(utf8.decoder).join();
-        var credits = Credits.fromJson(jsonDecode(data));
-        return credits.cast;
-      }
-    }, onError: (error, stacktrace) {});
-  }
-
-  Future<List<Genre>> fetchGenres() {
-    final resource = '3/genre/movie/list';
-    var httpClient = HttpClient();
-    var uri = Uri.https(ApiBaseUri, resource, {
-      'api_key': _tmdbKey,
-      'language': 'en-US',
-    });
-    return httpClient.getUrl(uri).then((request) async {
-      var response = await request.close();
-      if (response.statusCode == HttpStatus.ok) {
-        var data = await response.transform(utf8.decoder).join();
-        var genres = GenreCollection.fromJson(jsonDecode(data));
-        return genres.results;
-      }
-    }, onError: (error, stacktrace) {});
+    return api.fetchCast(movie.id);
   }
 
   @override
-  Future<List<Movie>> searchMovies(String keyword, [int page = 1]) async {
+  Future<List<Movie>> searchMovies(String query, [int page = 1]) async {
     if (_genres == null)
-      _genres = await fetchGenres();
+      _genres = await api.fetchGenres();
+    var movies = await api.searchMovies(query, page);
+    _setMovieGenres(movies);
+    return movies;
+  }
 
-    final resource = '3/search/movie';
-    var httpClient = HttpClient();
-    var uri = Uri.https(ApiBaseUri, resource, {
-      'api_key': _tmdbKey,
-      'page': page.toString(),
-      'query': keyword,
-      'language': 'en-US',
-      'include_adult': 'false',
-    });
+  void _setMovieGenres(List<Movie> movies) {
+    movies.forEach(_setMovieGenre);
+  }
 
-    return httpClient.getUrl(uri)
-        .then((request) async {
-          var response = await request.close();
-          if (response.statusCode == HttpStatus.ok) {
-            var data = await response.transform(utf8.decoder).join();
-            var movies = MovieCollection.fromJson(jsonDecode(data), _genres);
-            return movies.results;
-          }
-        },
-        onError: (error, stacktrace) {
-
-        });
+  void _setMovieGenre(Movie movie) {
+    if (_genres == null)
+      return;
+    var tmdbMovie = movie as TmdbMovie;
+    tmdbMovie.genres = _genres
+      .where((genre) => tmdbMovie.genreIds.any((id) => id == genre.id))
+      .toList();
   }
 }
