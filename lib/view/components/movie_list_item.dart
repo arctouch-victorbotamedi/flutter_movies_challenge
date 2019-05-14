@@ -57,7 +57,8 @@ class MovieListItem extends StatelessWidget {
                 itemBuilder: (context) => Text(_movie.title,
                     style: Theme.of(context).textTheme.title,
                     textAlign: TextAlign.left,
-                    overflow: TextOverflow.fade),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis),
                 isLoaded: isLoaded,
                 width: 300,
                 height: theme.textTheme.title.fontSize
