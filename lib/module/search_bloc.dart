@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:movies_challenge/data/movie_repository.dart';
 import 'package:movies_challenge/module/search_event.dart';
 import 'package:movies_challenge/module/search_state.dart';
+import 'package:rxdart/rxdart.dart';
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   final MovieRepository movieRepository;
@@ -12,6 +13,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   @override
   SearchState get initialState => UninitializedState();
+
+  @override
+  Stream<SearchEvent> transform(Stream<SearchEvent> events) {
+    return (events as Observable<SearchEvent>)
+        .debounce(Duration(milliseconds: 1000));
+  }
 
   @override
   Stream<SearchState> mapEventToState(SearchEvent event) async* {
